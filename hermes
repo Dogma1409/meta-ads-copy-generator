@@ -1,0 +1,65 @@
+# meta-ads-copy-generator
+
+> TRIGGER: meta-ads-copy, meta-ads-copy-generator, ads copy, WideStep, demo
+
+## Estado
+- Phase: Gate 1 cerrado (skeleton Express + /health + repo inicializado).
+- Last verified: 2026-08-22.
+- Vacante objetivo: AI Automation Engineer en WideStep (USD 700/mes, remoto, contrato, cierra en 27 días desde 22-ago-2026).
+- Demo deploy objetivo: Railway (cuenta enlazada con GitHub Dogma1409).
+- Stack: Node 20 + Express + TypeScript + Groq SDK + frontend vanilla + Inter via Google Fonts + Railway.
+- Proveedor LLM: Groq, modelo `llama-3.1-8b-instant` (default) o `llama-3.3-70b-versatile` (upgrade).
+
+## Reglas del proyecto
+- Backend: Node 20 + TypeScript CommonJS (target ES2020, mismo que alegra-v3).
+- Frontend: vanilla HTML/CSS/JS, **cero dependencias JS** vía CDN. Solo tipografía via Google Fonts (Inter) permitido.
+- LLM factory: provider+model explícitos, sin default silencioso, throw loud si faltan.
+- Credenciales: pegar en `.env` una sola vez, nunca en memoria ni en chat. `.env` en `.gitignore`.
+- Sin BD. Sin auth. Demo stateless (cada request es independiente).
+- Cache en memoria (TTL 1h por default, configurable via `CACHE_TTL_SECONDS`).
+
+## Deploy
+- Path local: `/mnt/c/Users/David g/Desktop/meta-ads-copy-generator/` (WSL).
+- Repo: `github.com/Dogma1409/meta-ads-copy-generator` (public).
+- Railway: cuenta enlazada con GitHub Dogma1409. Deploy automático en push a `main`.
+- URL pública: la asigna Railway (formato `*.up.railway.app`).
+- Comandos clave:
+  - `npm run dev` → `ts-node src/index.ts`.
+  - `npm run typecheck` → `tsc --noEmit`.
+  - `npm run build` → `tsc` (genera `dist/`).
+  - `npm start` → `node dist/index.js`.
+- Variables de entorno en Railway: `GROQ_API_KEY`, `GROQ_MODEL`, `PORT` (Railway lo setea auto).
+
+## Arquitectura
+- Diagrama validado 22-ago-2026. Resumen:
+  - Frontend (vanilla): Form input → POST /api/generate → Vista resultados → POST /api/score → Ad preview + Download JSON.
+  - Backend (Express+TS): POST /api/generate (generator.ts + prompts) → Cache LLM response → POST /api/score (scorer.ts heurística pura) → exporter.ts (formato Meta Ads API v20).
+  - Groq API: llamado por generator.ts solo si no hay hit en cache.
+  - Ad preview y Download JSON son client-side puro (sin backend).
+
+## Plan
+- Plan completo de implementación en `plandocs/01-meta-ads-copy-generator.md` (draft, 6 gates).
+- Gate 1 (skeleton): ✓ cerrado.
+- Gate 2 (LLM factory + /api/generate): pendiente, próximo.
+- Gate 3 (scorer + /api/score): pendiente.
+- Gate 4 (frontend): pendiente.
+- Gate 5 (deploy Railway): pendiente.
+- Gate 6 (cover letter actualizado + video opcional): pendiente.
+
+## Gotchas locales
+- Sin git workflow complejo. Push directo a `main`.
+- `groq-sdk@0.7.0` instalado, verificar API key antes del primer generate.
+- Railway free tier: si la app duerme por inactividad, el primer request tarda ~10s. Esto es comportamiento de Railway, no bug.
+- Si Railway da error "Application failed to respond", verificar que PORT esté en env (Railway lo inyecta auto).
+
+## Sesiones recientes
+- 2026-08-22: Validación de WideStep + repo creado + diagrama de flujo validado. Gate 1 cerrado (skeleton Express + /health). Decisiones cerradas: nombre del proyecto, GitHub username (Dogma1409), LLM (Groq llama-3.1-8b-instant), frontend (vanilla + Inter Google Fonts), video (nice-to-have), Railway account (enlazada con GitHub).
+- 2026-08-22: Input de ejemplo WideStep BareFlex Pro definido. Datos de demo realistas: producto + descripción técnica + audiencia específica (mujeres 45-70 años, enfermeras/maestras con dolor crónico).
+
+## Pendientes
+- **Gate 2**: implementar LLM factory + POST /api/generate. Usar WideStep BareFlex Pro como test fixture.
+- **Gate 3**: scorer heurístico + POST /api/score.
+- **Gate 4**: frontend (form input + vista resultados + ad preview + download JSON).
+- **Gate 5**: deploy Railway + README con screenshots.
+- **Gate 6**: actualizar cover letter WideStep con link a demo + video opcional.
+- **Aplicación**: mandar cover letter por Torre.
