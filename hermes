@@ -3,8 +3,8 @@
 > TRIGGER: meta-ads-copy, meta-ads-copy-generator, ads copy, WideStep, demo
 
 ## Estado
-- Phase: Gate 1 cerrado (skeleton Express + /health + repo inicializado).
-- Last verified: 2026-08-22.
+- Phase: Gate 3 cerrado (scorer heurístico + asserts automatizados, commit `3e5d784`).
+- Last verified: 2026-08-24.
 - Vacante objetivo: AI Automation Engineer en WideStep (USD 700/mes, remoto, contrato, cierra en 27 días desde 22-ago-2026).
 - Demo deploy objetivo: Railway (cuenta enlazada con GitHub Dogma1409).
 - Stack: Node 20 + Express + TypeScript + Groq SDK + frontend vanilla + Inter via Google Fonts + Railway.
@@ -40,9 +40,9 @@
 ## Plan
 - Plan completo de implementación en `plandocs/01-meta-ads-copy-generator.md` (draft, 6 gates).
 - Gate 1 (skeleton): ✓ cerrado.
-- Gate 2 (LLM factory + /api/generate): pendiente, próximo.
-- Gate 3 (scorer + /api/score): pendiente.
-- Gate 4 (frontend): pendiente.
+- Gate 2 (LLM factory + /api/generate): pendiente. NOTA: el scorer funciona como librería + CLI standalone (`npm run test:fixtures`), pero NO está wireado a un endpoint HTTP todavía. Cuando se arme el frontend en Gate 4, el route POST /api/score se implementa en el mismo turn.
+- Gate 3 (scorer + /api/score): parcialmente cerrado — scorer standalone ✓ (commit `3e5d784`, separation 58.4, asserts automatizados), endpoint HTTP pendiente de Gate 4.
+- Gate 4 (frontend): próximo. Incluye wirear scorer al endpoint POST /api/score.
 - Gate 5 (deploy Railway): pendiente.
 - Gate 6 (cover letter actualizado + video opcional): pendiente.
 
@@ -53,13 +53,32 @@
 - Si Railway da error "Application failed to respond", verificar que PORT esté en env (Railway lo inyecta auto).
 
 ## Sesiones recientes
+- 2026-08-24: Gate 3 cerrado commit `3e5d784 feat(gate3): scoring with auto-asserts`. 6 YAML OKF v0.2 en `src/scoring/rules/`, scorer TS en `src/services/scorer.ts`, fixtures 10+10 en `src/scoring/test-fixtures/v1/` con `violations_expected`, harness `run-fixtures.ts` con asserts automatizados (prefix match, exit 1 si falla, `expect_outlier` para gaps). `npm run test:fixtures` y `npm run typecheck` exit 0. Separation=58.4 (good mean 65 vs bad mean 6.6). 1 expected outlier (bad-06) aceptado por review. Bundle OKF v0.2 con 4 sources verificadas (Meta Ads Guide jul-2026, AdEspresso jun-2026, AppsFlyer 2025 vía Billo, WordStream 2025). `trust_tier: unverified`. Skill `okf-pattern` actualizada con código real verificado. Push al remoto pendiente (esperando nuevo PAT post-rotación del `ghp_ft...RjXH` original).
 - 2026-08-22: Validación de WideStep + repo creado + diagrama de flujo validado. Gate 1 cerrado (skeleton Express + /health). Decisiones cerradas: nombre del proyecto, GitHub username (Dogma1409), LLM (Groq llama-3.1-8b-instant), frontend (vanilla + Inter Google Fonts), video (nice-to-have), Railway account (enlazada con GitHub).
 - 2026-08-22: Input de ejemplo WideStep BareFlex Pro definido. Datos de demo realistas: producto + descripción técnica + audiencia específica (mujeres 45-70 años, enfermeras/maestras con dolor crónico).
 
 ## Pendientes
-- **Gate 2**: implementar LLM factory + POST /api/generate. Usar WideStep BareFlex Pro como test fixture.
-- **Gate 3**: scorer heurístico + POST /api/score.
-- **Gate 4**: frontend (form input + vista resultados + ad preview + download JSON).
+- **Gate 2**: implementar LLM factory + POST /api/generate. Usar WideStep BareFlex Pro como test fixture. Recordar regla transversal: provider+model explícitos, throw loud si faltan (caller nunca debe quedar con default silencioso).
+- **Gate 4 (próximo)**: frontend (form input + vista resultados + ad preview + download JSON) + wirear scorer al endpoint POST /api/score en el mismo turn. Decisiones pendientes:
+  - Diseño visual: copiar el patrón "footer + modal Librerías del Sistema" de alegra-v3 (decisión transversal del vertical IA, documentada en hermes de alegra-v3).
+  - Estructura HTML/CSS: vanilla, sin CDN, solo Inter via Google Fonts (ya validado).
+  - Flujo de UX: form → POST /api/generate (LLM) → para cada variación, mostrar score del scorer → permitir download JSON con todas las variaciones rankeadas.
 - **Gate 5**: deploy Railway + README con screenshots.
 - **Gate 6**: actualizar cover letter WideStep con link a demo + video opcional.
 - **Aplicación**: mandar cover letter por Torre.
+- **Push del commit `3e5d784`** al remoto (esperando nuevo PAT GitHub).
+
+## Dónde quedé (24-ago-2026)
+- Cerrado: Gate 3 (commit `3e5d784`) con scorer + asserts automatizados.
+- Próximo paso: **Gate 2 ahora, Gate 4 después**. NO al revés. Gate 4 sin Gate 2 es una UI bonita sin backend funcional, no tiene sentido.
+- Decisiones tomadas en la sesión del 24-ago (confirmadas por David):
+  1. **Gate 4 con Gate 2 primero** — el frontend necesita `/api/generate` para tener algo real que mostrar. Scorer (Gate 3) ya existe standalone, Gate 2 lo wirea con el LLM factory.
+  2. **Modal simple** para Gate 4 — sin fricción visual innecesaria, el esfuerzo va al flujo end-to-end. No copiar el modal de alegra-v3 tal cual (over-engineer para esta demo).
+  3. Frontend vanilla, cero CDN JS, solo Inter via Google Fonts.
+  4. Scorer se wirea a POST /api/score en el mismo turn del frontend (Gate 4), no antes — Gate 2 solo implementa `/api/generate`.
+  5. Assertions del scorer son el regression gate — si toco pesos de reglas después, corro `npm run test:fixtures` antes de pushear.
+- Plan revisado de gates:
+  - Gate 2 (próximo): LLM factory + POST /api/generate + provider+model explícitos (throw loud si faltan, regla transversal del vertical IA).
+  - Gate 4: frontend simple (form input → POST /api/generate → POST /api/score → lista variaciones rankeadas → download JSON) + wirear scorer a POST /api/score.
+  - Gate 5: deploy Railway.
+  - Gate 6: cover letter + video opcional.
