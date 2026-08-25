@@ -1,0 +1,33 @@
+type: ScoringRuleBundle
+title: meta-ads-copy-generator scoring rules v1
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources:
+  - id: meta-ads-guide
+    description: Meta Ads Help Center — primary text and headline visible character limits for mobile placements.
+    resource: https://www.facebook.com/business/help/4302912900
+    author: Meta Platforms, Inc.
+    last_modified: 2026-07-25
+  - id: adespresso-2025
+    description: AdEspresso blog post on specificity and numbers in ad copy (June 2026 reference).
+    resource: https://adespresso.com/blog/ad-copy-best-practices/
+    author: AdEspresso (Hootsuite)
+    last_modified: 2026-06-15
+  - id: appsflyer-2025-via-billo
+    description: AppsFlyer 2025 Creative Insights report — 70-80% of Meta Ad performance comes from creative strength. Cited by Billo (2026).
+    resource: https://billo.app/blog/appsflyer-creative-insights-2025
+    author: AppsFlyer / Billo
+    last_modified: 2026-02-10
+  - id: wordstream-2025
+    description: WordStream 2025 Meta Ads benchmark — CTR averages across 1,280 US campaigns. Source for penalties on aggressive all-caps copy.
+    resource: https://www.wordstream.com/blog/ws/2025/03/meta-ads-benchmarks
+    author: WordStream (LocaliQ)
+    last_modified: 2025-03-20
+description: >
+  Deterministic CTR heuristic rules for Meta Ads copy. Applied AFTER the LLM
+  generates variations. Rules are auditable, version-pinned, and source-traced.
+  No LLM involvement in scoring. Six rules in v1. Max +70. Min -25.
+trust_tier: unverified

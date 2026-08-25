@@ -1,0 +1,67 @@
+type: ScoringRuleGroup
+title: Engagement signals — numbers and hook strength
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources:
+  - id: adespresso-2025
+    description: Specificity bias — numbers beat vague claims. Source for R3.
+    resource: https://adespresso.com/blog/ad-copy-best-practices/
+    author: AdEspresso (Hootsuite)
+    last_modified: 2026-06-15
+  - id: appsflyer-2025-via-billo
+    description: 70-80% of Meta Ad performance comes from creative/hook strength. Source for R4.
+    resource: https://billo.app/blog/appsflyer-creative-insights-2025
+    author: AppsFlyer / Billo
+    last_modified: 2026-02-10
+rules:
+  - id: R3_numbers_in_primary_text
+    applies_to: [primary_text]
+    weight: 15
+    check:
+      type: regex_match_any
+      patterns:
+        - "\\b\\d+%\\b"
+        - "\\b\\d{1,3}(,\\d{3})+\\b"
+        - "\\b\\d+\\s*(hours|days|minutes|weeks|months|years)\\b"
+        - "\\b\\d+\\s*(inches|cm|mm)\\b"
+        - "\\b\\d+\\s*(stars?|rated)\\b"
+        - "\\b\\d+\\s*(customers|buyers|nurses|teachers|women|men|people)\\b"
+        - "\\bin\\s+\\d+\\s+(days|minutes|hours)\\b"
+    scoring:
+      match: 15
+      no_match: 0
+    violation_message: "primary_text has no specific numbers. Specificity ('40% wider', 'in 3 days') outperforms vague claims ('more', 'soon')."
+    rationale: >
+      AdEspresso (June 2026) documents the specificity bias — concrete numbers
+      create credibility and help users visualize outcomes. Vague claims like
+      "save time" or "comfortable" underperform.
+  - id: R4_hook_strength
+    applies_to: [primary_text]
+    weight: 20
+    check:
+      type: composite
+      steps:
+        - extract_first_sentence
+        - assert_word_count: { max: 15, fail_score: 0 }
+        - assert_pattern_match_any:
+            patterns:
+              - "\\?$"
+              - "^(Stop|Avoid|Try|Discover|Find out|Choose|Pick|Get|Need|Get rid of|Tired of)\\b"
+              - "\\b(can't|cannot|won't|hate|tired of|dealing with|suffering from|painful|frustrating|frustrated|worst|nightmare|killing|ruining)\\b"
+              - "\\b(never|always|guaranteed|#1|only|proven|science-backed|clinically|award-winning|patented)\\b"
+              - "\\b(in \\d+ (days|minutes|hours|weeks)|instantly|overnight|today|right now|this week)\\b"
+    scoring:
+      both_met: 20
+      only_word_count: 0
+      nothing: 0
+    violation_message: "primary_text opener is weak. AppsFlyer 2025: 70-80% of Meta Ad performance comes from creative/hook strength. Open with a question, pain point, bold claim, or imperative."
+    rationale: >
+      AppsFlyer 2025 (cited by Billo, Feb 2026) — the first sentence does most
+      of the persuasion. This rule enforces a concrete structure: short opener
+      (<=15 words) AND a recognized hook pattern. Detection uses pattern
+      matching against a closed list (5 families: question, imperative, pain,
+      bold claim, outcome-in-time). At least ONE pattern must match. Auditable:
+      patterns visible in this YAML, not hidden in code.

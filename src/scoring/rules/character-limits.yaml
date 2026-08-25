@@ -1,0 +1,51 @@
+type: ScoringRuleGroup
+title: Character limits — primary text and headline
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources:
+  - id: meta-ads-guide
+    resource: https://www.facebook.com/business/help/4302912900
+    author: Meta Platforms, Inc.
+    last_modified: 2026-07-25
+rules:
+  - id: R1_primary_text_length
+    applies_to: [primary_text]
+    weight: 20
+    unit: chars
+    check:
+      type: range
+      optimal_min: 80
+      optimal_max: 125
+      hard_limit: 2200
+    scoring:
+      in_optimal: 20
+      under_min: 0
+      over_max: 0
+    violation_message: "primary_text is {actual_chars} chars. Optimal range is 80-125 (visible in mobile feed before 'See more')."
+    rationale: >
+      Meta's mobile feed shows ~125 chars of primary text before the "See more"
+      fold (Meta Ads Guide, July 2026). Below 80 chars, the copy under-utilizes
+      the slot and tends to feel like an incomplete sentence. Above 125, the
+      second half is invisible to most mobile users — wasted tokens.
+  - id: R2_headline_length
+    applies_to: [headline]
+    weight: 15
+    unit: chars
+    check:
+      type: tiered
+      optimal_max: 27
+      acceptable_max: 40
+      hard_limit: 40
+    scoring:
+      optimal: 15
+      acceptable: 8
+      over_hard: -10
+    violation_message: "headline is {actual_chars} chars. Optimal <=27, acceptable <=40, hard cap 40."
+    rationale: >
+      27 chars is what most Meta placements show before truncation (Meta Ads
+      Guide). 28-40 is the "acceptable" zone — sometimes shown, sometimes
+      truncated. Over 40 is the hard cap — anything longer is rejected by
+      Meta's API at upload time, so the scorer must flag it as a hard failure.

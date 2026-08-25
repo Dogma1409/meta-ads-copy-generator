@@ -1,0 +1,48 @@
+type: ScoringRuleGroup
+title: Format rules — emojis and capitalization
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources:
+  - id: wordstream-2025
+    description: WordStream 2025 Meta Ads benchmark. CTR averages across 1,280 US campaigns.
+    resource: https://www.wordstream.com/blog/ws/2025/03/meta-ads-benchmarks
+    author: WordStream (LocaliQ)
+    last_modified: 2025-03-20
+rules:
+  - id: R5_emoji_in_primary_text
+    applies_to: [primary_text]
+    weight: 0
+    check:
+      type: regex_match
+      pattern: "[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]"
+    scoring:
+      match: 0
+      no_match: 0
+    violation_message: "Emoji presence: {emoji_status}. v1 is audience-agnostic, so emojis are neutral. v2 may apply a negative weight if WideStep confirms an older-skewing audience."
+    rationale: >
+      Industry guidance (cited in 2026 reports) suggests emojis reduce
+      performance for B2C brands targeting audiences 45+. WideStep's audience
+      hypothesis (women 45-70) is plausible but NOT publicly verified. v2
+      will make this configurable via a target_audience flag once WideStep
+      confirms. v1 stays neutral so the scorer is not encoding a hypothesis
+      as a rule.
+  - id: R6_all_caps_excess
+    applies_to: [primary_text]
+    weight: -15
+    check:
+      type: ratio
+      metric: uppercase_chars
+      denominator: total_letters
+      threshold: 0.30
+    scoring:
+      over_threshold: -15
+      under_threshold: 0
+    violation_message: "primary_text has {pct}% uppercase letters. Over 30% reads as aggressive/shouty and correlates with lower CTR (WordStream 2025 benchmark)."
+    rationale: >
+      WordStream 2025 documents that aggressive all-caps copy correlates with
+      below-benchmark CTR. The threshold (30%) is conservative — only flags
+      copy that is clearly shouting, not copy that uses caps for emphasis
+      (e.g., a single acronym or proper noun).

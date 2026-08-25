@@ -1,0 +1,73 @@
+[
+  {
+    "id": "good-01",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Stop letting bunion pain ruin your shifts. The BareFlex Pro fits a 40% wider toe box — your feet will thank you after hour 8.",
+    "headline": "All-Day Comfort, Real Width",
+    "description": "Certified comfort footwear for women on their feet all day."
+  },
+  {
+    "id": "good-02",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Tired of shoes that pinch by lunch? Try the barefoot comfort 12,400 nurses swear by. Zero break-in time.",
+    "headline": "Feet Hurt? Read This.",
+    "description": "Comfort that lasts a 12-hour shift."
+  },
+  {
+    "id": "good-03",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Why are 4 out of 5 teachers switching to barefoot shoes? The answer is in the 8mm toe box — free guide inside.",
+    "headline": "Teachers, This Is For You",
+    "description": "Footwear designed for the way you actually stand."
+  },
+  {
+    "id": "good-04",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Discover why 2,300 customers rated the BareFlex Pro 4.8 stars. Clinically-backed arch support, 14-day test drive.",
+    "headline": "Why Women Are Switching",
+    "description": "Barefoot comfort, science-backed design."
+  },
+  {
+    "id": "good-05",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Can't stand shoes that look orthopedic? The BareFlex Pro is proof: 6 colorways, zero compromise on fit.",
+    "headline": "Style Meets Comfort",
+    "description": "Comfort that does not look like a medical shoe."
+  },
+  {
+    "id": "good-06",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Avoid the #1 mistake women make with bunion shoes: 40% wider toe box changes everything in 3 days.",
+    "headline": "One Mistake, Fixed",
+    "description": "The mistake most bunion shoes make.",
+    "expect_outlier": true
+  },
+  {
+    "id": "good-07",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Standing 10 hours? Your knees take the hit. The BareFlex Pro cuts impact by 28% — guaranteed.",
+    "headline": "Knees Hurt at Hour 10?",
+    "description": "Footwear engineered for long shifts."
+  },
+  {
+    "id": "good-08",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Find out how 1 in 4 nurses fixed chronic heel pain without inserts. The BareFlex Pro, in 3 colors.",
+    "headline": "Heel Pain-Free in Days",
+    "description": "Relief designed by podiatrists."
+  },
+  {
+    "id": "good-09",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Worst shoes for plantar fasciitis? Anything narrower than 4 inches at the toe. The BareFlex Pro fixes that.",
+    "headline": "Plantar Fasciitis? Read.",
+    "description": "Footwear designed around the plantar fascia."
+  },
+  {
+    "id": "good-10",
+    "product": "BareFlex Pro Comfort Sneaker",
+    "primary_text": "Stop choosing between style and comfort. The BareFlex Pro delivers both — proven by 8,200 verified buyers.",
+    "headline": "Style AND Comfort",
+    "description": "Comfort that fits your wardrobe."
+  }
+]

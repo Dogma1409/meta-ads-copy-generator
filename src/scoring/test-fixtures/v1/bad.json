@@ -1,0 +1,63 @@
+[
+  {
+    "id": "bad-01",
+    "primary_text": "BUY OUR AMAZING SHOES NOW!!! THEY ARE THE BEST SHOES EVER MADE FOR EVERYONE WHO WALKS ON FEET AND NEEDS COMFORTABLE FOOTWEAR FOR ALL OCCASIONS AND EVENTS AND WORK AND PLAY AND LIFE!!! LIMITED TIME OFFER ACT NOW BEFORE IT'S TOO LATE BECAUSE THIS DEAL WON'T LAST FOREVER AND YOU NEED THESE SHOES RIGHT NOW TODAY IMMEDIATELY!!!",
+    "headline": "BUY NOW",
+    "violations_expected": ["R1:primary_text_over_125", "R5:mayusculas_excess", "R4:hook_missing"]
+  },
+  {
+    "id": "bad-02",
+    "primary_text": "Shoes.",
+    "headline": "Buy shoes here.",
+    "violations_expected": ["R1:primary_text_under_80", "R3:numbers_missing", "R4:hook_missing"]
+  },
+  {
+    "id": "bad-03",
+    "primary_text": "These shoes are pretty good and they are comfortable and you might like them if you want comfortable shoes that are nice to wear.",
+    "headline": "Shoes that are comfortable to wear for everyone who likes comfortable shoes for daily comfort use",
+    "violations_expected": ["R3:numbers_missing", "R4:hook_weak"]
+  },
+  {
+    "id": "bad-04",
+    "primary_text": "Buy shoes.",
+    "headline": "Shoes.",
+    "violations_expected": ["R1:primary_text_under_80", "R3:numbers_missing", "R4:hook_missing"]
+  },
+  {
+    "id": "bad-05",
+    "primary_text": "DISCOVER THE ULTIMATE SOLUTION FOR ALL YOUR FOOTWEAR NEEDS WITH OUR REVOLUTIONARY NEW PRODUCT THAT CHANGES EVERYTHING ABOUT HOW YOU THINK ABOUT SHOES",
+    "headline": "AMAZING SHOES THAT WILL TRANSFORM YOUR LIFE FOREVER AND EVER",
+    "violations_expected": ["R1:primary_text_over_125", "R5:mayusculas_excess", "R2:headline_over_40"]
+  },
+  {
+    "id": "bad-06",
+    "primary_text": "We sell shoes. They come in many sizes. We have been in business for years. Our shoes are good quality.",
+    "headline": "Shoes from our company",
+    "violations_expected": ["R1:primary_text_under_80", "R3:numbers_missing", "R4:hook_weak"],
+    "expect_outlier": true
+  },
+  {
+    "id": "bad-07",
+    "primary_text": "BUY BUY BUY OUR SHOES RIGHT NOW THEY ARE ON SALE AND YOU SHOULD BUY THEM TODAY BECAUSE WE NEED TO SELL THEM TO YOU FAST BUY NOW!!!",
+    "headline": "BUY!!!",
+    "violations_expected": ["R1:primary_text_over_125", "R5:mayusculas_excess"]
+  },
+  {
+    "id": "bad-08",
+    "primary_text": "Shoe.",
+    "headline": "Buy.",
+    "violations_expected": ["R1:primary_text_under_80", "R3:numbers_missing", "R4:hook_missing"]
+  },
+  {
+    "id": "bad-09",
+    "primary_text": "These shoes are made with materials and have features that customers appreciate when they wear them for activities.",
+    "headline": "Shoe product for customer use",
+    "violations_expected": ["R3:numbers_missing", "R4:hook_weak"]
+  },
+  {
+    "id": "bad-10",
+    "primary_text": "GREETINGS DEAR CUSTOMER WE WOULD LIKE TO INFORM YOU ABOUT OUR WONDERFUL FOOTWEAR PRODUCTS WHICH ARE AVAILABLE FOR PURCHASE AT YOUR EARLIEST CONVENIENCE PLEASE CONSIDER BUYING OUR SHOES TODAY",
+    "headline": "PLEASE PURCHASE OUR SHOVES TODAY",
+    "violations_expected": ["R1:primary_text_over_125", "R5:mayusculas_excess", "R4:hook_weak"]
+  }
+]

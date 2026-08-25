@@ -1,0 +1,13 @@
+type: ScoringRuleGroup
+title: Penalty rules — reserved for future negative-weight rules
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources: []
+rules: []
+note: >
+  Currently contains no active rules. Reserved for future penalty rules such as
+  clickbait patterns, excessive punctuation, and misleading superlatives.
+  R6 (all-caps excess, in format.yaml) is the only active penalty in v1.

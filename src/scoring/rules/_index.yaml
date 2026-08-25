@@ -1,0 +1,40 @@
+type: ScoringRuleIndex
+title: Active scoring rules registry v1
+status: stable
+stale_after: 2027-01-01
+generated:
+  by: human:david_g + assistant:hermes
+  at: 2026-08-23
+sources: []
+active_rules:
+  - id: R1_primary_text_length
+    file: character-limits.yaml
+    enabled: true
+  - id: R2_headline_length
+    file: character-limits.yaml
+    enabled: true
+  - id: R3_numbers_in_primary_text
+    file: engagement.yaml
+    enabled: true
+  - id: R4_hook_strength
+    file: engagement.yaml
+    enabled: true
+  - id: R5_emoji_in_primary_text
+    file: format.yaml
+    enabled: true
+  - id: R6_all_caps_excess
+    file: format.yaml
+    enabled: true
+disabled_rules: []
+score_range:
+  min_theoretical: -25
+  max_theoretical: 70
+versioning:
+  current: v1
+  planned_v2:
+    - emoji weight becomes audience-configurable
+    - new penalties: clickbait, excessive punctuation
+    - possible R7 for description field scoring
+how_to_disable: >
+  Set enabled: false in this index for any rule. The YAML file stays on disk.
+  Useful when A/B testing the impact of a single rule.
