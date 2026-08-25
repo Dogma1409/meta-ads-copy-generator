@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "test:fixtures": "ts-node src/scoring/test-fixtures/v1/run-fixtures.ts",
-    "test:generate": "bash scripts/test-generate.sh"
+    "test:generate": "bash scripts/test-generate.sh",
+    "test:score": "bash scripts/test-score.sh"
   },
   "engines": {
     "node": ">=20"

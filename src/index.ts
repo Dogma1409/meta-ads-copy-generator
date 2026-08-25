@@ -17,6 +17,7 @@ import express from 'express'
 import { createLLMClient } from './orchestrator/llm'
 import { ResponseCache } from './cache'
 import { createGenerateRouter } from './routes/generate'
+import { createScoreRouter } from './routes/score'
 
 // --- Env validation ------------------------------------------------------
 
@@ -56,6 +57,9 @@ app.get('/health', (_req, res) => {
 const llm = createLLMClient({ provider: 'groq', model: GROQ_MODEL, apiKey: GROQ_API_KEY })
 const cache = new ResponseCache()
 app.use('/api', createGenerateRouter({ llm, cache, cacheTtlSeconds: CACHE_TTL_SECONDS }))
+
+// Gate 4 Phase B: POST /api/score (deterministic heuristic scorer, no LLM).
+app.use('/api', createScoreRouter())
 
 app.listen(PORT, () => {
   console.log(`meta-ads-copy-generator listening on http://localhost:${PORT}`)

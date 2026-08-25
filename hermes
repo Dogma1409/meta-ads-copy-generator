@@ -53,6 +53,7 @@
 - Si Railway da error "Application failed to respond", verificar que PORT esté en env (Railway lo inyecta auto).
 
 ## Sesiones recientes
+|- 2026-08-24: Gate 4 Phase B cerrado — POST /api/score wireado al scorer heurístico de Gate 3, frontend ahora lanza score por variación en paralelo después de generate y muestra badge top-right con color por umbral (verde >=0.7, ámbar >=0.4, rojo <0.4). Graceful degradation: scores null → banner "Note: could not score some variations". Smoke test `scripts/test-score.sh` valida good/bad copy (asserts: good total>0 + rules.length>=4, bad total<0 + al menos 1 rule con matched:false). Commit único + `Co-authored-by: hermes <hermes@worker>`.
 |- 2026-08-24: Gate 4 Phase A — minimal frontend wired to /api/generate. Browser smoke test pending.
 |- 2026-08-24: Gate 2 cerrado. Commits: `c21485b` (hermes sync), `cf8de9c` (Gate 2 código: LLM factory + POST /api/generate + SHA-256 cache + retry-once strategy), `d054b7a` (fix: migración modelo + harden test script). Live test end-to-end verificado: HTTP 200, 3 variaciones WideStep BareFlex Pro, todas las assertions OK, exit 0, sin process leak (trap con `setsid` + `kill -- -$PID`). **Migración de modelo**: `llama-3.1-8b-instant` y `llama-3.3-70b-versatile` fueron deprecados por Groq el 16-ago-2026. Reemplazos: `openai/gpt-oss-20b` (default, $0.075 input / $0.30 output por 1M) y `openai/gpt-oss-120b` (upgrade, $0.15 input / $0.60 output por 1M). Ojo: el output del nuevo 20B es ~4x más caro que el viejo 8B. Skill `okf-pattern` actualizada con código real verificado del Gate 3 (cierre de la sesión anterior). **Push pendiente**: PAT nuevo en `.env` da 403 (scopes/SSO/revocación a diagnosticar en https://github.com/settings/tokens). 4 commits sin pushear (riesgo de pérdida si la máquina muere).
 - 2026-08-24: Gate 3 cerrado commit `3e5d784 feat(gate3): scoring with auto-asserts`. 6 YAML OKF v0.2 en `src/scoring/rules/`, scorer TS en `src/services/scorer.ts`, fixtures 10+10 en `src/scoring/test-fixtures/v1/` con `violations_expected`, harness `run-fixtures.ts` con asserts automatizados (prefix match, exit 1 si falla, `expect_outlier` para gaps). `npm run test:fixtures` y `npm run typecheck` exit 0. Separation=58.4 (good mean 65 vs bad mean 6.6). 1 expected outlier (bad-06) aceptado por review. Bundle OKF v0.2 con 4 sources verificadas (Meta Ads Guide jul-2026, AdEspresso jun-2026, AppsFlyer 2025 vía Billo, WordStream 2025). `trust_tier: unverified`. Skill `okf-pattern` actualizada con código real verificado.
@@ -66,6 +67,9 @@
   - Modal simple (decidido por David 24-ago) — no copiar el de alegra-v3.
   - Estructura HTML/CSS: vanilla, sin CDN, solo Inter via Google Fonts.
   - Flujo de UX: form → POST /api/generate (LLM) → para cada variación, mostrar score del scorer → permitir download JSON con todas las variaciones rankeadas.
+  - **Phase A cerrado** (commit `1a07814`): frontend mínimo wireado a /api/generate.
+  - **Phase B cerrado** (este commit): POST /api/score wireado al scorer de Gate 3 + badge por variación + note banner. Smoke test `scripts/test-score.sh` valida good/bad.
+  - **Phase C (próximo)**: polish visual (modal, ad preview, download JSON rankeado por score).
 - **Gate 5**: deploy Railway + README con screenshots.
 - **Gate 6**: actualizar cover letter WideStep con link a demo + video opcional.
 - **Aplicación**: mandar cover letter por Torre.
@@ -74,8 +78,8 @@
   - Cost tracking: cuando armemos la skill `cost-aware-coding`, el costo del output del nuevo modelo (`openai/gpt-oss-20b`: $0.30/1M) es ~4x más caro que el viejo `llama-3.1-8b-instant` ($0.08/1M). Anotar en el README final cuánto cuesta una llamada típica de 3 variaciones.
 
 ## Dónde quedé (24-ago-2026)
-- Cerrado: Gate 2 (live test verde) + Gate 3 (scorer con asserts) + Gate 4 Phase A (frontend vanilla mínimo wireado a /api/generate, smoke test pendiente). 4 commits funcionales + 1 fix + 1 hermes sync en `main` local, ninguno pusheado todavía.
-- Próximo paso: resolver el push (diagnosticar 403 del PAT en https://github.com/settings/tokens), después Gate 4 Phase B (wirear scorer a POST /api/score), después Phase C (visual polish del frontend).
+|- Cerrado: Gate 2 (live test verde) + Gate 3 (scorer con asserts) + Gate 4 Phase A (frontend vanilla mínimo wireado a /api/generate, smoke test pendiente) + Gate 4 Phase B (POST /api/score wireado al scorer + badge por variación + banner de note, smoke test pasa). 5 commits funcionales + 1 fix + 2 hermes sync en `main` local, ninguno pusheado todavía.
+|- Próximo paso: resolver el push (diagnosticar 403 del PAT en https://github.com/settings/tokens), después Gate 4 Phase C (polish visual del frontend: modal, ad preview, download JSON).
 - Decisiones tomadas en la sesión del 24-ago (confirmadas por David):
   1. **Gate 4 con Gate 2 primero** — el frontend necesita `/api/generate` para tener algo real que mostrar.
   2. **Modal simple** para Gate 4 — sin fricción visual innecesaria, el esfuerzo va al flujo end-to-end. No copiar el modal de alegra-v3 tal cual (over-engineer para esta demo).

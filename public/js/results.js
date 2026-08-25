@@ -1,12 +1,16 @@
-/* public/js/results.js — Gate 4 Phase A.
+/* public/js/results.js — Gate 4 Phase B.
  *
- * Results renderer. Three operations:
+ * Results renderer. Four operations:
  *   - clear(): empties the results and error regions.
- *   - render(variations, meta): draws a card per variation and a metadata
- *     footer with timing / model / token info.
+ *   - render(variations, meta, scores?): draws a card per variation (with an
+ *     optional score badge per card) and a metadata footer with timing /
+ *     model / token info.
  *   - error(message): shows a red error box and empties the results.
+ *   - setNote(message | null): shows/hides a small non-blocking banner above
+ *     the results (used to surface partial failures like "some variations
+ *     could not be scored").
  *
- * Exposes: window.Results = { clear, render, error }
+ * Exposes: window.Results = { clear, render, error, setNote }
  */
 (function () {
   'use strict'
@@ -30,9 +34,33 @@
     return String(value).replace(/[\u0000-\u0008\u000B-\u001F]/g, '')
   }
 
-  function buildVariationCard(variation) {
+  // Phase B: pick a color for the score badge based on the fraction of the
+  // theoretical maximum. Thresholds: green >= 0.7, amber >= 0.4, red < 0.4.
+  function badgeColor(total, maxPossible) {
+    if (!maxPossible || maxPossible <= 0) return '#dc2626'
+    var ratio = total / maxPossible
+    if (ratio >= 0.7) return '#16a34a'
+    if (ratio >= 0.4) return '#f59e0b'
+    return '#dc2626'
+  }
+
+  function buildScoreBadge(score) {
+    var badge = document.createElement('span')
+    badge.className = 'score-badge'
+    badge.textContent = 'Score: ' + score.total + ' / ' + score.max_possible
+    badge.style.background = badgeColor(score.total, score.max_possible)
+    return badge
+  }
+
+  function buildVariationCard(variation, score) {
     var card = document.createElement('article')
     card.className = 'variation-card'
+
+    // Phase B: relative wrapper so the badge can sit top-right of the card
+    // without taking it out of the document flow.
+    if (score && typeof score.total === 'number' && typeof score.max_possible === 'number') {
+      card.appendChild(buildScoreBadge(score))
+    }
 
     var headline = document.createElement('h3')
     headline.className = 'headline'
@@ -52,7 +80,7 @@
     return card
   }
 
-  function render(variations, meta) {
+  function render(variations, meta, scores) {
     var results = $('results')
     var errorBox = $('error')
     errorBox.innerHTML = ''
@@ -65,8 +93,14 @@
       return
     }
 
-    variations.forEach(function (variation) {
-      results.appendChild(buildVariationCard(variation))
+    // Graceful degradation: scores are optional and must align 1:1 with
+    // variations. If length differs, drop them entirely (Phase B spec).
+    var useScores =
+      Array.isArray(scores) && scores.length === variations.length
+
+    variations.forEach(function (variation, idx) {
+      var score = useScores ? scores[idx] : null
+      results.appendChild(buildVariationCard(variation, score))
     })
 
     var safeMeta = meta || {}
@@ -101,9 +135,35 @@
     errorBox.hidden = false
   }
 
+  /**
+   * Show or hide a small non-blocking note banner above the results.
+   * `null` or empty string hides it. The element is created on first use
+   * and re-used on subsequent calls (idempotent).
+   */
+  function setNote(message) {
+    var note = $('results-note')
+    if (!note) {
+      note = document.createElement('div')
+      note.id = 'results-note'
+      note.className = 'results-note'
+      var resultsRegion = $('results')
+      if (resultsRegion && resultsRegion.parentNode) {
+        resultsRegion.parentNode.insertBefore(note, resultsRegion)
+      }
+    }
+    if (message === null || message === undefined || message === '') {
+      note.textContent = ''
+      note.hidden = true
+      return
+    }
+    note.textContent = message
+    note.hidden = false
+  }
+
   window.Results = {
     clear: clear,
     render: render,
     error: error,
+    setNote: setNote,
   }
 })()
