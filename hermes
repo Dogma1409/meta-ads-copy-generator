@@ -53,32 +53,39 @@
 - Si Railway da error "Application failed to respond", verificar que PORT esté en env (Railway lo inyecta auto).
 
 ## Sesiones recientes
-- 2026-08-24: Gate 3 cerrado commit `3e5d784 feat(gate3): scoring with auto-asserts`. 6 YAML OKF v0.2 en `src/scoring/rules/`, scorer TS en `src/services/scorer.ts`, fixtures 10+10 en `src/scoring/test-fixtures/v1/` con `violations_expected`, harness `run-fixtures.ts` con asserts automatizados (prefix match, exit 1 si falla, `expect_outlier` para gaps). `npm run test:fixtures` y `npm run typecheck` exit 0. Separation=58.4 (good mean 65 vs bad mean 6.6). 1 expected outlier (bad-06) aceptado por review. Bundle OKF v0.2 con 4 sources verificadas (Meta Ads Guide jul-2026, AdEspresso jun-2026, AppsFlyer 2025 vía Billo, WordStream 2025). `trust_tier: unverified`. Skill `okf-pattern` actualizada con código real verificado. Push al remoto pendiente (esperando nuevo PAT post-rotación del `ghp_ft...RjXH` original).
+- 2026-08-24: Gate 2 cerrado. Commits: `c21485b` (hermes sync), `cf8de9c` (Gate 2 código: LLM factory + POST /api/generate + SHA-256 cache + retry-once strategy), `d054b7a` (fix: migración modelo + harden test script). Live test end-to-end verificado: HTTP 200, 3 variaciones WideStep BareFlex Pro, todas las assertions OK, exit 0, sin process leak (trap con `setsid` + `kill -- -$PID`). **Migración de modelo**: `llama-3.1-8b-instant` y `llama-3.3-70b-versatile` fueron deprecados por Groq el 16-ago-2026. Reemplazos: `openai/gpt-oss-20b` (default, $0.075 input / $0.30 output por 1M) y `openai/gpt-oss-120b` (upgrade, $0.15 input / $0.60 output por 1M). Ojo: el output del nuevo 20B es ~4x más caro que el viejo 8B. Skill `okf-pattern` actualizada con código real verificado del Gate 3 (cierre de la sesión anterior). **Push pendiente**: PAT nuevo en `.env` da 403 (scopes/SSO/revocación a diagnosticar en https://github.com/settings/tokens). 4 commits sin pushear (riesgo de pérdida si la máquina muere).
+- 2026-08-24: Gate 3 cerrado commit `3e5d784 feat(gate3): scoring with auto-asserts`. 6 YAML OKF v0.2 en `src/scoring/rules/`, scorer TS en `src/services/scorer.ts`, fixtures 10+10 en `src/scoring/test-fixtures/v1/` con `violations_expected`, harness `run-fixtures.ts` con asserts automatizados (prefix match, exit 1 si falla, `expect_outlier` para gaps). `npm run test:fixtures` y `npm run typecheck` exit 0. Separation=58.4 (good mean 65 vs bad mean 6.6). 1 expected outlier (bad-06) aceptado por review. Bundle OKF v0.2 con 4 sources verificadas (Meta Ads Guide jul-2026, AdEspresso jun-2026, AppsFlyer 2025 vía Billo, WordStream 2025). `trust_tier: unverified`. Skill `okf-pattern` actualizada con código real verificado.
 - 2026-08-22: Validación de WideStep + repo creado + diagrama de flujo validado. Gate 1 cerrado (skeleton Express + /health). Decisiones cerradas: nombre del proyecto, GitHub username (Dogma1409), LLM (Groq llama-3.1-8b-instant), frontend (vanilla + Inter Google Fonts), video (nice-to-have), Railway account (enlazada con GitHub).
 - 2026-08-22: Input de ejemplo WideStep BareFlex Pro definido. Datos de demo realistas: producto + descripción técnica + audiencia específica (mujeres 45-70 años, enfermeras/maestras con dolor crónico).
 
 ## Pendientes
-- **Gate 2**: implementar LLM factory + POST /api/generate. Usar WideStep BareFlex Pro como test fixture. Recordar regla transversal: provider+model explícitos, throw loud si faltan (caller nunca debe quedar con default silencioso).
+- **Gate 2 ✓ cerrado** (commits `cf8de9c` + `d054b7a`): LLM factory + POST /api/generate + SHA-256 cache + retry-once strategy. Live test exit 0 con `openai/gpt-oss-20b`. NO reabrir salvo que cambien los requisitos del demo.
+- **Push al remoto** (URGENTE): 4 commits sin pushear (`d054b7a`, `cf8de9c`, `c21485b`, `3e5d784`). Riesgo de pérdida si muere la máquina. Diagnosticar 403 del PAT en https://github.com/settings/tokens — ver scopes (`repo` o `public_repo`), SSO authorization, revocación. Una vez resuelto, `git push origin main`.
 - **Gate 4 (próximo)**: frontend (form input + vista resultados + ad preview + download JSON) + wirear scorer al endpoint POST /api/score en el mismo turn. Decisiones pendientes:
-  - Diseño visual: copiar el patrón "footer + modal Librerías del Sistema" de alegra-v3 (decisión transversal del vertical IA, documentada en hermes de alegra-v3).
-  - Estructura HTML/CSS: vanilla, sin CDN, solo Inter via Google Fonts (ya validado).
+  - Modal simple (decidido por David 24-ago) — no copiar el de alegra-v3.
+  - Estructura HTML/CSS: vanilla, sin CDN, solo Inter via Google Fonts.
   - Flujo de UX: form → POST /api/generate (LLM) → para cada variación, mostrar score del scorer → permitir download JSON con todas las variaciones rankeadas.
 - **Gate 5**: deploy Railway + README con screenshots.
 - **Gate 6**: actualizar cover letter WideStep con link a demo + video opcional.
 - **Aplicación**: mandar cover letter por Torre.
-- **Push del commit `3e5d784`** al remoto (esperando nuevo PAT GitHub).
+- **Deuda técnica**:
+  - `src/scoring/rules/manifest.yaml` usa `resource:` singular → migrar a `resources:` plural (OKF v0.2 spec). Migrar antes de cualquier deploy público que cite los sources.
+  - Cost tracking: cuando armemos la skill `cost-aware-coding`, el costo del output del nuevo modelo (`openai/gpt-oss-20b`: $0.30/1M) es ~4x más caro que el viejo `llama-3.1-8b-instant` ($0.08/1M). Anotar en el README final cuánto cuesta una llamada típica de 3 variaciones.
 
 ## Dónde quedé (24-ago-2026)
-- Cerrado: Gate 3 (commit `3e5d784`) con scorer + asserts automatizados.
-- Próximo paso: **Gate 2 ahora, Gate 4 después**. NO al revés. Gate 4 sin Gate 2 es una UI bonita sin backend funcional, no tiene sentido.
+- Cerrado: Gate 2 (live test verde) + Gate 3 (scorer con asserts). 3 commits funcionales + 1 fix + 1 hermes sync en `main` local, ninguno pusheado todavía.
+- Próximo paso: resolver el push (diagnosticar 403 del PAT en https://github.com/settings/tokens), después Gate 4.
 - Decisiones tomadas en la sesión del 24-ago (confirmadas por David):
-  1. **Gate 4 con Gate 2 primero** — el frontend necesita `/api/generate` para tener algo real que mostrar. Scorer (Gate 3) ya existe standalone, Gate 2 lo wirea con el LLM factory.
+  1. **Gate 4 con Gate 2 primero** — el frontend necesita `/api/generate` para tener algo real que mostrar.
   2. **Modal simple** para Gate 4 — sin fricción visual innecesaria, el esfuerzo va al flujo end-to-end. No copiar el modal de alegra-v3 tal cual (over-engineer para esta demo).
   3. Frontend vanilla, cero CDN JS, solo Inter via Google Fonts.
-  4. Scorer se wirea a POST /api/score en el mismo turn del frontend (Gate 4), no antes — Gate 2 solo implementa `/api/generate`.
+  4. Scorer se wirea a POST /api/score en el mismo turn del frontend (Gate 4).
   5. Assertions del scorer son el regression gate — si toco pesos de reglas después, corro `npm run test:fixtures` antes de pushear.
+  6. **Dos commits separados** para docs vs feature (hermes sync primero, después código). Si algo de un gate necesita revert, no arrastra el hermes con eso.
+  7. **Validar antes de próximo gate**: push + live-test son obligatorios antes de empezar el siguiente. Razones: backup remoto (riesgo de pérdida) y evitar cascading rework cost si hay un problema de integración que no se detectó en el gate anterior.
 - Plan revisado de gates:
-  - Gate 2 (próximo): LLM factory + POST /api/generate + provider+model explícitos (throw loud si faltan, regla transversal del vertical IA).
-  - Gate 4: frontend simple (form input → POST /api/generate → POST /api/score → lista variaciones rankeadas → download JSON) + wirear scorer a POST /api/score.
+  - Gate 3 ✓ cerrado.
+  - Gate 2 ✓ cerrado.
+  - Gate 4 (próximo): frontend + wirear scorer a POST /api/score.
   - Gate 5: deploy Railway.
   - Gate 6: cover letter + video opcional.
