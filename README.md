@@ -10,60 +10,55 @@ Built as a portfolio project for an AI Automation Engineer application (WideStep
 - **Backend**: Node 20 + Express + TypeScript + Groq SDK (`llama-3.1-8b-instant` by default).
 - **Frontend**: Vanilla HTML/CSS/JS. Zero JS dependencies. Inter font via Google Fonts.
 - **Deploy**: Railway.
-- **Repo**: public.
 
-## How it works
+## Endpoints
 
-1. User enters product name, description, target audience, and number of variations (1-10) in the frontend.
-2. Frontend POSTs to `/api/generate`. Backend calls Groq LLM with structured prompt asking for `N` variations across different psychological angles (benefit, pain point, social proof, urgency, question).
-3. Backend caches the LLM response by `hash(input)` with TTL 1h. Subsequent identical requests skip the LLM call.
-4. Frontend receives variations. POSTs to `/api/score` to get a CTR heuristic score (0-100) for each.
-5. Frontend renders variations + scores + a Meta Ad preview (image placeholder + copy).
-6. User clicks "Download JSON" to get a file in Meta Marketing API v20 format, ready to upload via `POST /act_{ad-account-id}/adcreatives`.
+### `GET /health`
+Liveness probe. Returns `{"status":"ok"}`.
+
+### `POST /api/generate`
+Generate N variations of Meta Ads copy (`primary_text` + `headline` + `description`).
+
+**Request** (JSON): `product_name`, `product_description`, `audience`, `variations_count` (1-10).
+**Response** (200): `{ variations: [...], model_used, tokens_in, tokens_out, duration_ms }`.
+
+- Responses are cached in-process by SHA-256 of the canonical request for `CACHE_TTL_SECONDS` (default 3600).
+- On LLM error: returns 502 with `{ "error": "LLM provider error: ..." }`.
 
 ## Local development
 
 ```bash
-# Install deps
 npm install
-
-# Copy env template and fill in your Groq API key
-cp .env.example .env
-# Edit .env: paste your GROQ_API_KEY
-
-# Run dev server
-npm run dev
-
-# Type check
-npm run typecheck
-
-# Smoke test
-curl http://localhost:3001/health
-# {"status":"ok"}
+cp .env.example .env             # edit .env: paste your GROQ_API_KEY
+npm run dev                      # server on http://localhost:3001
+npm run typecheck                # TypeScript strict check
+npm run test:fixtures            # Gate 3 regression gate (scorer asserts)
+npm run test:generate            # smoke test for /api/generate (skips if no key)
 ```
 
-## Deploy
+## Example curl
 
-Push to `main` triggers Railway auto-deploy.
-
-Required env vars in Railway:
-- `GROQ_API_KEY` (get yours at https://console.groq.com/keys)
-- `GROQ_MODEL` (default: `llama-3.1-8b-instant`)
-- `PORT` (Railway sets this automatically)
+```bash
+curl -X POST http://localhost:3001/api/generate \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "product_name": "WideStep BareFlex Pro",
+    "product_description": "Zapatilla barefoot de caña baja, suela de 4 mm de goma flexible, upper de piel sintética transpirable.",
+    "audience": "Mujeres y hombres de 30-55 años con dolor crónico de espalda o rodillas.",
+    "variations_count": 3
+  }'
+```
 
 ## Files of interest
 
-- `src/index.ts` — Express entrypoint.
-- `src/services/llm.ts` — LLM factory (planned, Gate 2).
-- `src/services/generator.ts` — Variations generator (planned, Gate 2).
-- `src/services/scorer.ts` — CTR heuristic scorer (planned, Gate 3).
-- `src/services/exporter.ts` — Meta Ads API v20 JSON exporter (planned, Gate 4).
-- `src/prompts/variations.ts` — System + user prompts for Groq (planned, Gate 2).
-- `public/` — Frontend (planned, Gate 4).
-
-## Status
-
-**Gate 1 (skeleton) closed.** `/health` endpoint live. Frontend and LLM integration coming in subsequent gates.
+- `src/index.ts` — Express entrypoint, env validation, route mounting.
+- `src/orchestrator/llm.ts` — LLM factory + Groq client wrapper.
+- `src/orchestrator/prompts.ts` — System + user prompt templates.
+- `src/routes/generate.ts` — `POST /api/generate` handler.
+- `src/cache.ts` — In-memory response cache with lazy TTL.
+- `src/services/scorer.ts` — CTR heuristic scorer (Gate 3, standalone).
+- `src/scoring/` — YAML rules + test fixtures (Gate 3, regression-gated).
+- `public/` — Frontend (Gate 4, not yet present).
 
 See `hermes` for the full project context, plan, and pending items.
 
