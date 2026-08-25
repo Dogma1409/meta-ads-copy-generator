@@ -1,0 +1,165 @@
+/* public/css/style.css — Gate 4 Phase A minimal styling.
+ * Phase C will add visual polish. Keep this file lean. */
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f7f7f8;
+  color: #1a1a1a;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* --- Layout ----------------------------------------------------- */
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header h1 {
+  font-weight: 600;
+  font-size: 28px;
+  margin: 0 0 4px;
+}
+
+.page-header .subtitle {
+  margin: 0 0 24px;
+  color: #555;
+  font-size: 14px;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 18px;
+  margin: 24px 0 12px;
+}
+
+/* --- Form ------------------------------------------------------- */
+.form-section {
+  margin-bottom: 32px;
+}
+
+#generate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #ffffff;
+  color: #1a1a1a;
+  box-sizing: border-box;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.btn-primary {
+  margin-top: 8px;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-primary:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+/* --- Results ---------------------------------------------------- */
+.results-section {
+  margin-top: 16px;
+}
+
+#results:empty {
+  display: none;
+}
+
+.variation-card {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ececef;
+}
+
+.variation-card .headline {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 6px;
+  color: #1a1a1a;
+}
+
+.variation-card .primary-text {
+  font-weight: 400;
+  font-size: 14px;
+  margin: 0 0 6px;
+  color: #333;
+}
+
+.variation-card .description {
+  font-style: italic;
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.results-meta {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+/* --- Errors ----------------------------------------------------- */
+.error-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.error-box[hidden] {
+  display: none;
+}
