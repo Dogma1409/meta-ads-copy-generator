@@ -60,29 +60,36 @@ BASE_URL="http://localhost:${PORT}"
 echo "=== Starting server on port ${PORT} ==="
 
 # Use ts-node so we don't need to build first. Run from project root.
-npx ts-node src/index.ts >/tmp/meta-ads-test-server.log 2>&1 &
+# `setsid` puts the server in its own process group so we can kill the whole
+# tree (npm -> npx -> ts-node -> node) on cleanup, not just the npx shell.
+setsid npx ts-node src/index.ts >/tmp/meta-ads-test-server.log 2>&1 &
 SERVER_PID=$!
 
-# Always kill the server on exit, even on assertion failure.
+# Always kill the entire process group of the server on exit, even on
+# assertion failure. `kill -- -PID` targets the group whose leader is PID.
 cleanup() {
   if kill -0 "$SERVER_PID" 2>/dev/null; then
-    kill "$SERVER_PID" 2>/dev/null
+    kill -- "-$SERVER_PID" 2>/dev/null || kill "$SERVER_PID" 2>/dev/null
     wait "$SERVER_PID" 2>/dev/null
   fi
+  # Belt-and-suspenders: any leftover ts-node src/index.ts child from a
+  # previous run that didn't get reaped (shouldn't happen but cheap).
+  pkill -f 'ts-node src/index.ts' 2>/dev/null
 }
 trap cleanup EXIT
 
-# Wait for /health (max 15s).
-for i in $(seq 1 30); do
+# Wait for /health (max 30s — ts-node + groq-sdk load takes ~10s on this box).
+for i in $(seq 1 60); do
   if curl -s -o /dev/null -w '%{http_code}' "${BASE_URL}/health" 2>/dev/null | grep -q '^200$'; then
-    echo "Server up after ${i}*0.5s."
+    echo "Server up after $((i * 500))ms."
     break
   fi
   sleep 0.5
-  if [ "$i" = "30" ]; then
-    echo "FAIL: server did not become healthy within 15s."
+  if [ "$i" = "60" ]; then
+    echo "FAIL: server did not become healthy within 30s."
     echo "--- server log ---"
     cat /tmp/meta-ads-test-server.log
+    cleanup
     exit 1
   fi
 done
