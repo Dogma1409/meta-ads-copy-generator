@@ -3,11 +3,11 @@
 > TRIGGER: meta-ads-copy, meta-ads-copy-generator, ads copy, WideStep, demo
 
 ## Estado
-- Phase: Gate 3 cerrado (scorer heurístico + asserts automatizados, commit `3e5d784`).
-- Last verified: 2026-08-24.
+- Phase: Gate 4 Phase B cerrado + fix crítico de deploy (27-ago-2026).
+- Last verified: 2026-08-27.
 - Vacante objetivo: AI Automation Engineer en WideStep (USD 700/mes, remoto, contrato, cierra en 27 días desde 22-ago-2026).
-- Demo deploy objetivo: Railway (cuenta enlazada con GitHub Dogma1409).
-- Stack: Node 20 + Express + TypeScript + Groq SDK + frontend vanilla + Inter via Google Fonts + Railway.
+- Demo deploy objetivo: Render (URL actual `meta-ads-copy-generator.onrender.com`, vista 27-ago en captura).
+- Stack: Node 20 + Express + TypeScript + Groq SDK + frontend vanilla + Inter via Google Fonts + Render.
 - Proveedor LLM: Groq, modelo `llama-3.1-8b-instant` (default) o `llama-3.3-70b-versatile` (upgrade).
 
 ## Reglas del proyecto
@@ -21,14 +21,13 @@
 ## Deploy
 - Path local: `/mnt/c/Users/David g/Desktop/meta-ads-copy-generator/` (WSL).
 - Repo: `github.com/Dogma1409/meta-ads-copy-generator` (public).
-- Railway: cuenta enlazada con GitHub Dogma1409. Deploy automático en push a `main`.
-- URL pública: la asigna Railway (formato `*.up.railway.app`).
+- Render: deploy automático en push a `main`. URL pública asignada por Render.
 - Comandos clave:
   - `npm run dev` → `ts-node src/index.ts`.
   - `npm run typecheck` → `tsc --noEmit`.
-  - `npm run build` → `tsc` (genera `dist/`).
+  - `npm run build` → `prebuild` copia YAML de reglas (`scripts/copy-rules.js`) + `tsc` (genera `dist/` con .js + .yaml).
   - `npm start` → `node dist/index.js`.
-- Variables de entorno en Railway: `GROQ_API_KEY`, `GROQ_MODEL`, `PORT` (Railway lo setea auto).
+- Variables de entorno en Render: `GROQ_API_KEY`, `GROQ_MODEL`, `PORT` (Render lo setea auto).
 
 ## Arquitectura
 - Diagrama validado 22-ago-2026. Resumen:
@@ -49,11 +48,14 @@
 ## Gotchas locales
 - Sin git workflow complejo. Push directo a `main`.
 - `groq-sdk@0.7.0` instalado, verificar API key antes del primer generate.
-- Railway free tier: si la app duerme por inactividad, el primer request tarda ~10s. Esto es comportamiento de Railway, no bug.
-- Si Railway da error "Application failed to respond", verificar que PORT esté en env (Railway lo inyecta auto).
+- Render free tier: si la app duerme por inactividad, el primer request tarda ~10s. Esto es comportamiento de Render, no bug.
+- Si Render da error "Application failed to respond", verificar que PORT esté en env (Render lo inyecta auto).
+- **CRÍTICO 27-ago-2026**: `tsc` no copia archivos `.yaml` al `dist/`. El scorer (`src/services/scorer.ts`) lee los YAML de reglas desde el filesystem en runtime. Si build no incluye paso de copy, `/api/score` tira `ENOENT` en cada request, el catch en `score.ts` devuelve 500, y el frontend degrada a `null` + banner "could not score some variations". Fix: `scripts/copy-rules.js` corre como `prebuild` y copia `src/scoring/rules/*.yaml` → `dist/scoring/rules/` (con `fs.rmSync` recursivo antes para evitar stale data entre rebuilds). **Cualquier futuro recurso YAML/JSON/etc que el scorer o algún otro módulo lea por filesystem debe sumarse a `scripts/copy-rules.js`.** Verificación post-fix: `node -e "const {score}=require('./dist/services/scorer.js'); console.log(score({primary_text:'test',headline:'x'}).total)"` debe imprimir un número, no tirar ENOENT.
+- Diagnóstico de "scoring failures" en producción: el frontend mapea cualquier respuesta con `error` o status no-2xx a `null` (`public/js/app.js` línea 31), así que un bug sistémico se ve igual que un fallo aleatorio. Si en logs de Render ves `[score] scorer failed:` eso es el catch server-side → revisar `err.code` (ENOENT = YAML missing, otro = mirar el stack).
 
 ## Sesiones recientes
-|- 2026-08-24: Gate 4 Phase B cerrado — POST /api/score wireado al scorer heurístico de Gate 3, frontend ahora lanza score por variación en paralelo después de generate y muestra badge top-right con color por umbral (verde >=0.7, ámbar >=0.4, rojo <0.4). Graceful degradation: scores null → banner "Note: could not score some variations". Smoke test `scripts/test-score.sh` valida good/bad copy (asserts: good total>0 + rules.length>=4, bad total<0 + al menos 1 rule con matched:false). Commit único + `Co-authored-by: hermes <hermes@worker>`.
+- 2026-08-27: **Fix crítico de deploy** — `/api/score` fallaba en producción con banner "could not score some variations" en cada variation. Root cause: `tsc` no copia los `.yaml` de `src/scoring/rules/` al `dist/`, scorer tiraba `ENOENT` por cada request, catch en `score.ts` devolvía 500, frontend degradaba a `null`. Confirmado reproduciendo el ENOENT exacto con `node -e "..."` desde `dist/`. Fix mínimo (opción A elegida por David): nuevo `scripts/copy-rules.js` (Node stdlib, `fs.cpSync`, idempotente + rm-then-copy para evitar stale data entre rebuilds) atado como `prebuild` en `package.json`. Verificado: `npm run build` ahora copia 6 YAMLs a `dist/scoring/rules/`, `npm run test:score` verde, smoke manual contra `node dist/index.js` responde HTTP 200 con scores reales (good total=50, bad total=0, 6 rules). `hermes` actualizado con el gotcha. Pendiente: commit + push (4 commits seguían sin pushear desde 24-ago; ahora son 5 incluyendo el fix) y diagnóstico del 403 PAT.
+- 2026-08-24: Gate 4 Phase B cerrado — POST /api/score wireado al scorer heurístico de Gate 3, frontend ahora lanza score por variación en paralelo después de generate y muestra badge top-right con color por umbral (verde >=0.7, ámbar >=0.4, rojo <0.4). Graceful degradation: scores null → banner "Note: could not score some variations". Smoke test `scripts/test-score.sh` valida good/bad copy (asserts: good total>0 + rules.length>=4, bad total<0 + al menos 1 rule con matched:false). Commit único + `Co-authored-by: hermes <hermes@worker>`.
 |- 2026-08-24: Gate 4 Phase A — minimal frontend wired to /api/generate. Browser smoke test pending.
 |- 2026-08-24: Gate 2 cerrado. Commits: `c21485b` (hermes sync), `cf8de9c` (Gate 2 código: LLM factory + POST /api/generate + SHA-256 cache + retry-once strategy), `d054b7a` (fix: migración modelo + harden test script). Live test end-to-end verificado: HTTP 200, 3 variaciones WideStep BareFlex Pro, todas las assertions OK, exit 0, sin process leak (trap con `setsid` + `kill -- -$PID`). **Migración de modelo**: `llama-3.1-8b-instant` y `llama-3.3-70b-versatile` fueron deprecados por Groq el 16-ago-2026. Reemplazos: `openai/gpt-oss-20b` (default, $0.075 input / $0.30 output por 1M) y `openai/gpt-oss-120b` (upgrade, $0.15 input / $0.60 output por 1M). Ojo: el output del nuevo 20B es ~4x más caro que el viejo 8B. Skill `okf-pattern` actualizada con código real verificado del Gate 3 (cierre de la sesión anterior). **Push pendiente**: PAT nuevo en `.env` da 403 (scopes/SSO/revocación a diagnosticar en https://github.com/settings/tokens). 4 commits sin pushear (riesgo de pérdida si la máquina muere).
 - 2026-08-24: Gate 3 cerrado commit `3e5d784 feat(gate3): scoring with auto-asserts`. 6 YAML OKF v0.2 en `src/scoring/rules/`, scorer TS en `src/services/scorer.ts`, fixtures 10+10 en `src/scoring/test-fixtures/v1/` con `violations_expected`, harness `run-fixtures.ts` con asserts automatizados (prefix match, exit 1 si falla, `expect_outlier` para gaps). `npm run test:fixtures` y `npm run typecheck` exit 0. Separation=58.4 (good mean 65 vs bad mean 6.6). 1 expected outlier (bad-06) aceptado por review. Bundle OKF v0.2 con 4 sources verificadas (Meta Ads Guide jul-2026, AdEspresso jun-2026, AppsFlyer 2025 vía Billo, WordStream 2025). `trust_tier: unverified`. Skill `okf-pattern` actualizada con código real verificado.
