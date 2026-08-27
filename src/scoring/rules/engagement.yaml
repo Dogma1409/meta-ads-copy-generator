@@ -8,12 +8,14 @@ generated:
 sources:
   - id: adespresso-2025
     description: Specificity bias — numbers beat vague claims. Source for R3.
-    resource: https://adespresso.com/blog/ad-copy-best-practices/
+    resources:
+      - https://adespresso.com/blog/ad-copy-best-practices/
     author: AdEspresso (Hootsuite)
     last_modified: 2026-06-15
   - id: appsflyer-2025-via-billo
     description: 70-80% of Meta Ad performance comes from creative/hook strength. Source for R4.
-    resource: https://billo.app/blog/appsflyer-creative-insights-2025
+    resources:
+      - https://billo.app/blog/appsflyer-creative-insights-2025
     author: AppsFlyer / Billo
     last_modified: 2026-02-10
 rules:

@@ -7,7 +7,8 @@ generated:
   at: 2026-08-23
 sources:
   - id: meta-ads-guide
-    resource: https://www.facebook.com/business/help/4302912900
+    resources:
+      - https://www.facebook.com/business/help/4302912900
     author: Meta Platforms, Inc.
     last_modified: 2026-07-25
 rules:

@@ -8,7 +8,8 @@ generated:
 sources:
   - id: wordstream-2025
     description: WordStream 2025 Meta Ads benchmark. CTR averages across 1,280 US campaigns.
-    resource: https://www.wordstream.com/blog/ws/2025/03/meta-ads-benchmarks
+    resources:
+      - https://www.wordstream.com/blog/ws/2025/03/meta-ads-benchmarks
     author: WordStream (LocaliQ)
     last_modified: 2025-03-20
 rules:
